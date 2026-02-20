@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Boss Timers</title>
+  <style>
+    :root{
+      --bg0:#050608;
+      --bg1:#0a0c10;
+      --panel:#0c0f14;
+      --text:#e8e8ea;
+      --muted:#9aa0a6;
+
+      --accentRed:#ff3b3b;
+      --accentGold:#caa24a;
+      --accentGold2:#f2d38a;
+
+      --shadow: 0 20px 60px rgba(0,0,0,.55);
+      --radius: 14px;
+      --radius2: 10px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 700px at 10% 0%, rgba(255,59,59,.12), transparent 60%),
+        radial-gradient(900px 600px at 90% 10%, rgba(202,162,74,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color:var(--text);
+      padding:24px;
+    }
+
+    h1,h2{
+      margin:0 0 14px 0;
+      letter-spacing:.2px;
+    }
+
+    .wrap{
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .section{
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+
+    .input, .btn{
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding: 0 10px;
+      outline:none;
+    }
+    .input{
+      min-width: 150px;
+    }
+    .btn{
+      cursor:pointer;
+      font-weight: 600;
+      letter-spacing: .2px;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+      background: rgba(255,255,255,.06);
+    }
+    .btn:hover{
+      background: rgba(255,255,255,.09);
+      border-color: rgba(255,255,255,.18);
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      background: rgba(120,170,255,.18);
+      border-color: rgba(120,170,255,.35);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .card{
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      overflow:hidden;
+    }
+
+    /* Red outer + gold inner like your screenshot */
+    .card.manual{
+      border: 2px solid rgba(255,59,59,.75);
+    }
+    .card.scheduled{
+      border: 2px solid rgba(202,162,74,.60);
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset: 10px;
+      border-radius: calc(var(--radius) - 8px);
+      border: 1px solid rgba(242,211,138,.25);
+      pointer-events:none;
+      opacity:.8;
+    }
+
+    .topRow{
+      display:flex;
+      justify-content: space-between;
+      align-items:flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .bossName{
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      line-height: 1.1;
+      max-width: 75%;
+    }
+
+    .pill{
+      font-size: 11px;
+      color: rgba(255,255,255,.85);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space:nowrap;
+      user-select:none;
+    }
+
+    .timer{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: .4px;
+      margin: 2px 0 6px 0;
+    }
+    .timer.red{ color: var(--accentRed); }
+    .timer.white{ color: #ffffff; }
+
+    .nextLine{
+      font-size: 11px;
+      color: rgba(255,255,255,.8);
+      margin-bottom: 10px;
+      letter-spacing: .2px;
+    }
+    .nextLine span{
+      color: var(--accentGold2);
+      font-weight: 700;
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items:center;
+      margin-bottom: 10px;
+    }
+    .dateRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .miniBtn{
+      height: 30px;
+      border-radius: 9px;
+      border: 1px solid rgba(202,162,74,.55);
+      background: rgba(202,162,74,.10);
+      color: rgba(255,255,255,.92);
+      font-weight: 700;
+      letter-spacing: .2px;
+      cursor:pointer;
+    }
+    .miniBtn:hover{
+      background: rgba(202,162,74,.14);
+      border-color: rgba(202,162,74,.75);
+    }
+
+    .btnStack{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .stackBtn{
+      height: 30px;
+      border-radius: 10px;
+      border: 1px solid rgba(242,211,138,.35);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.92);
+      font-weight: 750;
+      cursor:pointer;
+      text-transform: none;
+    }
+    .stackBtn:hover{
+      background: rgba(255,255,255,.06);
+      border-color: rgba(242,211,138,.55);
+    }
+
+    .footer{
+      font-size: 10px;
+      color: rgba(255,255,255,.55);
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+      padding-top: 4px;
+    }
+
+    .dangerSmall{
+      position:absolute;
+      top: 10px;
+      right: 10px;
+      border: 1px solid rgba(255,59,59,.35);
+      background: rgba(255,59,59,.08);
+      border-radius: 999px;
+      height: 26px;
+      padding: 0 9px;
+      color: rgba(255,255,255,.9);
+      font-weight: 800;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap: 6px;
+    }
+    .dangerSmall:hover{
+      background: rgba(255,59,59,.12);
+      border-color: rgba(255,59,59,.55);
+    }
+
+    .muted{ color: var(--muted); }
+
+    .hint{
+      font-size: 12px;
+      color: rgba(255,255,255,.65);
+      margin-top: -6px;
+      margin-bottom: 10px;
+    }
+
+    /* Make the section headers look like the screenshot */
+    .sectionTitle{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      margin-bottom: 10px;
+    }
+    .sectionTitle h2{
+      font-size: 18px;
+      font-weight: 900;
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- MANUAL -->
+  <div class="section" id="manualSection">
+    <div class="sectionTitle">
+      <h2>Manual Boss Timers</h2>
+      <div class="toolbar">
+        <input class="input" id="manualName" placeholder="Boss Name" />
+        <input class="input" id="manualHours" placeholder="Hours" type="number" step="0.01" min="0" />
+        <button class="btn primary" id="addManual">Add Manual Timer</button>
+        <button class="btn" id="resetAll">Reset All</button>
+      </div>
+      <div class="hint">Manual bosses: set a respawn in hours. Use <span class="muted">Killed Now</span> to start the countdown.</div>
+    </div>
+
+    <div class="grid" id="manualGrid"></div>
+  </div>
+
+  <!-- SCHEDULED -->
+  <div class="section" id="scheduledSection">
+    <div class="sectionTitle">
+      <h2>Scheduled Bosses</h2>
+      <div class="toolbar">
+        <input class="input" id="schedName" placeholder="Boss Name" />
+        <input class="input" id="schedRule" placeholder="Schedule e.g. mon 12:30, tue 19:00" />
+        <button class="btn primary" id="addScheduled">Add Scheduled Boss</button>
+      </div>
+      <div class="hint">
+        Scheduled bosses: write times like <span class="muted">mon 19:00, wed 11:30, thu 11:30</span>. 24-hour time recommended.
+      </div>
+    </div>
+
+    <div class="grid" id="scheduledGrid"></div>
+  </div>
+
+</div>
+
+<script>
+/* ---------------------------
+   Storage + defaults
+----------------------------*/
+const LS_KEY = "bossTimers_v1";
+
+const DEFAULT_MANUAL = [
+  { name:"Baron Braudmore", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:45:01" },
+  { name:"Gareth", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:45:52" },
+  { name:"Lady Dalia", hours: 6, lastKill: null, lastRestart: null },
+  { name:"Ego", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:35:09" },
+  { name:"Livera", hours: 6, lastKill: null, lastRestart: null },
+  { name:"Araneo", hours: 6, lastKill: null, lastRestart: null },
+  { name:"Undomiel", hours: 6, lastKill: null, lastRestart: null },
+  { name:"Amentis", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:44:17" },
+  { name:"General Aquleus", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:44:35" },
+  { name:"Larba", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:50:28" },
+  { name:"Shuliar", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:50:41" },
+  { name:"Catena", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:51:06" },
+  { name:"Venatus", hours: 6, lastKill: null, lastRestart: "2026-01-13T19:34:08" },
+  { name:"Viorent", hours: 6, lastKill: null, lastRestart: "2026-01-13T19:34:24" },
+  { name:"Titore", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:42:46" },
+  { name:"Duplican", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:46:57" },
+  { name:"Metus", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:47:15" },
+  { name:"Wannitas", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:47:29" },
+  { name:"Secreta", hours: 6, lastKill: null, lastRestart: "2026-01-13T18:47:49" },
+  { name:"Ordo", hours: 6, lastKill: null, lastRestart: "2026-01-13T18:47:53" },
+  { name:"Asta", hours: 6, lastKill: null, lastRestart: "2026-01-13T18:48:00" },
+  { name:"Supore", hours: 72, lastKill: "2026-02-20T01:57:18", lastRestart: "2026-02-20T01:57:18" }
+];
+
+const DEFAULT_SCHEDULED = [
+  { name:"Roderick", rule:"fri 19:00" },
+  { name:"Milavy", rule:"sat 15:00" },
+  { name:"Ringor", rule:"sat 17:00" },
+  { name:"Saphirus", rule:"sun 17:00, tue 17:00" },
+  { name:"Auraq", rule:"sun 21:00, wed 21:00" },
+  { name:"Climantis", rule:"mon 11:30, thu 11:30" },
+  { name:"Thymele", rule:"mon 19:00, wed 19:00" },
+  { name:"Neutro", rule:"tue 19:00, thu 19:00" }
+];
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return { manual: DEFAULT_MANUAL, scheduled: DEFAULT_SCHEDULED };
+    const parsed = JSON.parse(raw);
+    return {
+      manual: Array.isArray(parsed.manual) ? parsed.manual : DEFAULT_MANUAL,
+      scheduled: Array.isArray(parsed.scheduled) ? parsed.scheduled : DEFAULT_SCHEDULED
+    };
+  }catch{
+    return { manual: DEFAULT_MANUAL, scheduled: DEFAULT_SCHEDULED };
+  }
+}
+function saveState(){
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+function resetAll(){
+  state.manual = structuredClone(DEFAULT_MANUAL);
+  state.scheduled = structuredClone(DEFAULT_SCHEDULED);
+  saveState();
+  renderAll();
+}
+
+/* ---------------------------
+   Date helpers
+----------------------------*/
+const DOW = { sun:0, mon:1, tue:2, wed:3, thu:4, fri:5, sat:6 };
+
+function pad(n){ return String(n).padStart(2,"0"); }
+function formatClock(dt){
+  // Local time display, like "05:24 AM"
+  const h = dt.getHours();
+  const m = dt.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hh = h % 12 || 12;
+  return `${pad(hh)}:${pad(m)} ${ampm}`;
+}
+function formatShort(dt){
+  // e.g. 1/13/2026, 5:45:01 PM
+  const mo = dt.getMonth()+1;
+  const da = dt.getDate();
+  const yr = dt.getFullYear();
+  const h = dt.getHours();
+  const m = dt.getMinutes();
+  const s = dt.getSeconds();
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hh = h % 12 || 12;
+  return `${mo}/${da}/${yr}, ${hh}:${pad(m)}:${pad(s)} ${ampm}`;
+}
+
+function msToClock(ms){
+  const neg = ms < 0;
+  ms = Math.abs(ms);
+
+  const sec = Math.floor(ms / 1000);
+  const days = Math.floor(sec / 86400);
+  const hours = Math.floor((sec % 86400)/3600);
+  const mins = Math.floor((sec % 3600)/60);
+  const secs = sec % 60;
+
+  if(days > 0){
+    return `${days}:${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+  }
+  return `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+}
+
+function parseScheduleRule(ruleStr){
+  // "mon 12:30, tue 19:00"
+  // returns [{dow:1, hour:12, min:30}, ...]
+  const parts = ruleStr.split(",").map(s => s.trim()).filter(Boolean);
+  const out = [];
+  for(const p of parts){
+    const m = p.match(/^([a-z]{3})\s+(\d{1,2}):(\d{2})$/i);
+    if(!m) continue;
+    const dowKey = m[1].toLowerCase();
+    if(!(dowKey in DOW)) continue;
+    const hour = Math.max(0, Math.min(23, parseInt(m[2],10)));
+    const min = Math.max(0, Math.min(59, parseInt(m[3],10)));
+    out.push({ dow: DOW[dowKey], hour, min });
+  }
+  return out;
+}
+
+function nextOccurrenceFromRule(ruleStr, fromDate = new Date()){
+  const rules = parseScheduleRule(ruleStr);
+  if(rules.length === 0) return null;
+
+  const now = new Date(fromDate);
+  let best = null;
+
+  for(const r of rules){
+    // find next date matching r.dow at r.hour:r.min
+    const candidate = new Date(now);
+    candidate.setSeconds(0,0);
+    candidate.setHours(r.hour, r.min, 0, 0);
+
+    const curDow = now.getDay();
+    let addDays = (r.dow - curDow + 7) % 7;
+
+    // if same day but time passed, push 7 days
+    if(addDays === 0 && candidate <= now) addDays = 7;
+
+    candidate.setDate(candidate.getDate() + addDays);
+
+    if(!best || candidate < best) best = candidate;
+  }
+  return best;
+}
+
+/* ---------------------------
+   App state
+----------------------------*/
+let state = loadState();
+
+const manualGrid = document.getElementById("manualGrid");
+const scheduledGrid = document.getElementById("scheduledGrid");
+
+document.getElementById("addManual").addEventListener("click", () => {
+  const name = document.getElementById("manualName").value.trim();
+  const hoursStr = document.getElementById("manualHours").value.trim();
+  const hours = Number(hoursStr);
+
+  if(!name || !Number.isFinite(hours) || hours <= 0) return;
+
+  state.manual.unshift({
+    name,
+    hours,
+    lastKill: null,
+    lastRestart: new Date().toISOString()
+  });
+
+  document.getElementById("manualName").value = "";
+  document.getElementById("manualHours").value = "";
+  saveState();
+  renderAll();
+});
+
+document.getElementById("addScheduled").addEventListener("click", () => {
+  const name = document.getElementById("schedName").value.trim();
+  const rule = document.getElementById("schedRule").value.trim();
+  if(!name || !rule) return;
+
+  state.scheduled.unshift({ name, rule });
+  document.getElementById("schedName").value = "";
+  document.getElementById("schedRule").value = "";
+  saveState();
+  renderAll();
+});
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  if(confirm("Reset everything to defaults?")){
+    resetAll();
+  }
+});
+
+function removeBoss(kind, idx){
+  if(!confirm("Delete this boss?")) return;
+  state[kind].splice(idx, 1);
+  saveState();
+  renderAll();
+}
+
+/* ---------------------------
+   Manual logic
+----------------------------*/
+function getManualNextTime(b){
+  if(!b.lastKill) return null;
+  const kill = new Date(b.lastKill);
+  const next = new Date(kill.getTime() + (b.hours * 3600 * 1000));
+  return next;
+}
+
+function manualKilledNow(idx){
+  const now = new Date();
+  state.manual[idx].lastKill = now.toISOString();
+  state.manual[idx].lastRestart = now.toISOString();
+  saveState();
+  renderAll();
+}
+
+function manualSetKill(idx){
+  const dateEl = document.getElementById(`mk_date_${idx}`);
+  const timeEl = document.getElementById(`mk_time_${idx}`);
+  const dateVal = dateEl.value;
+  const timeVal = timeEl.value;
+
+  if(!dateVal || !timeVal) return;
+
+  // local datetime
+  const dt = new Date(`${dateVal}T${timeVal}:00`);
+  if(Number.isNaN(dt.getTime())) return;
+
+  state.manual[idx].lastKill = dt.toISOString();
+  state.manual[idx].lastRestart = new Date().toISOString();
+  saveState();
+  renderAll();
+}
+
+function manualSetNext(idx){
+  const dateEl = document.getElementById(`mn_date_${idx}`);
+  const timeEl = document.getElementById(`mn_time_${idx}`);
+  const dateVal = dateEl.value;
+  const timeVal = timeEl.value;
+
+  if(!dateVal || !timeVal) return;
+
+  const next = new Date(`${dateVal}T${timeVal}:00`);
+  if(Number.isNaN(next.getTime())) return;
+
+  // derive lastKill from next - hours
+  const kill = new Date(next.getTime() - (state.manual[idx].hours * 3600 * 1000));
+  state.manual[idx].lastKill = kill.toISOString();
+  state.manual[idx].lastRestart = new Date().toISOString();
+  saveState();
+  renderAll();
+}
+
+/* ---------------------------
+   Rendering
+----------------------------*/
+function renderAll(){
+  renderManual();
+  renderScheduled();
+}
+function renderManual(){
+  manualGrid.innerHTML = "";
+
+  state.manual.forEach((b, idx) => {
+    const next = getManualNextTime(b);
+    const nextTxt = next ? formatClock(next) : "--:-- --";
+
+    const card = document.createElement("div");
+    card.className = "card manual";
+
+    card.innerHTML = `
+      <button class="dangerSmall" title="Delete" aria-label="Delete">
+        ✕ <span style="font-size:11px; font-weight:900">DEL</span>
+      </button>
+
+      <div class="topRow">
+        <div class="bossName">${escapeHtml(b.name)}</div>
+        <div class="pill">${b.hours}h</div>
+      </div>
+
+      <div class="timer red" data-manual-timer="${idx}">00:00:00</div>
+      <div class="nextLine">NEXT: <span data-manual-next="${idx}">${nextTxt}</span></div>
+
+      <div class="controls">
+        <div class="dateRow">
+          <input class="input" id="mk_date_${idx}" type="date" />
+          <input class="input" id="mk_time_${idx}" type="time" />
+        </div>
+        <button class="miniBtn" data-action="fillKill" data-idx="${idx}" title="Fill with now">🕒</button>
+      </div>
+
+      <div class="controls">
+        <div class="dateRow">
+          <input class="input" id="mn_date_${idx}" type="date" />
+          <input class="input" id="mn_time_${idx}" type="time" />
+        </div>
+        <button class="miniBtn" data-action="fillNext" data-idx="${idx}" title="Fill with next">⏱</button>
+      </div>
+
+      <div class="btnStack">
+        <button class="stackBtn" data-action="killedNow" data-idx="${idx}">Killed Now</button>
+        <button class="stackBtn" data-action="setKill" data-idx="${idx}">Set Kill</button>
+        <button class="stackBtn" data-action="setNext" data-idx="${idx}">Set Next</button>
+      </div>
+
+      <div class="footer">
+        <div>Last restart: ${b.lastRestart ? escapeHtml(formatShort(new Date(b.lastRestart))) : "--"}</div>
+        <div class="muted">${b.lastKill ? "Kill set" : "No kill yet"}</div>
+      </div>
+    `;
+
+    // delete button
+    card.querySelector(".dangerSmall").addEventListener("click", () => removeBoss("manual", idx));
+
+    // actions
+    card.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if(!btn) return;
+      const action = btn.dataset.action;
+
+      if(action === "killedNow") manualKilledNow(idx);
+      if(action === "setKill") manualSetKill(idx);
+      if(action === "setNext") manualSetNext(idx);
+
+      if(action === "fillKill"){
+        const now = new Date();
+        document.getElementById(`mk_date_${idx}`).value = now.toISOString().slice(0,10);
+        document.getElementById(`mk_time_${idx}`).value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      }
+
+      if(action === "fillNext"){
+        const nxt = getManualNextTime(state.manual[idx]) || new Date();
+        document.getElementById(`mn_date_${idx}`).value = nxt.toISOString().slice(0,10);
+        document.getElementById(`mn_time_${idx}`).value = `${pad(nxt.getHours())}:${pad(nxt.getMinutes())}`;
+      }
+    });
+
+    manualGrid.appendChild(card);
+  });
+}
+
+function renderScheduled(){
+  scheduledGrid.innerHTML = "";
+
+  state.scheduled.forEach((b, idx) => {
+    const next = nextOccurrenceFromRule(b.rule, new Date());
+    const nextTxt = next ? formatClock(next) : "--:-- --";
+
+    const card = document.createElement("div");
+    card.className = "card scheduled";
+    card.innerHTML = `
+      <button class="dangerSmall" title="Delete" aria-label="Delete">
+        ✕ <span style="font-size:11px; font-weight:900">DEL</span>
+      </button>
+
+      <div class="topRow">
+        <div class="bossName">${escapeHtml(b.name)}</div>
+        <div class="pill">Scheduled</div>
+      </div>
+
+      <div class="timer white" data-sched-timer="${idx}">00:00:00</div>
+      <div class="nextLine">NEXT: <span data-sched-next="${idx}">${nextTxt}</span></div>
+
+      <div class="controls">
+        <input class="input" id="sr_${idx}" value="${escapeAttr(b.rule)}" />
+        <button class="miniBtn" data-action="saveRule" data-idx="${idx}">Save</button>
+      </div>
+
+      <div class="btnStack">
+        <button class="stackBtn" data-action="setNextNow" data-idx="${idx}">Set Next</button>
+      </div>
+
+      <div class="footer">
+        <div>Schedule: ${escapeHtml(b.rule)}</div>
+        <div class="muted">Local time</div>
+      </div>
+    `;
+
+    card.querySelector(".dangerSmall").addEventListener("click", () => removeBoss("scheduled", idx));
+
+    card.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if(!btn) return;
+      const action = btn.dataset.action;
+
+      if(action === "saveRule"){
+        const inp = document.getElementById(`sr_${idx}`);
+        const val = inp.value.trim();
+        if(!val) return;
+        state.scheduled[idx].rule = val;
+        saveState();
+        renderAll();
+      }
+
+      if(action === "setNextNow"){
+        // quick helper: sets the schedule to a single entry at next top-of-hour + 5 min on current day
+        const now = new Date();
+        now.setSeconds(0,0);
+        now.setMinutes(now.getMinutes() + 5);
+        const dowKey = Object.keys(DOW).find(k => DOW[k] === now.getDay()) || "mon";
+        const hh = pad(now.getHours());
+        const mm = pad(now.getMinutes());
+        state.scheduled[idx].rule = `${dowKey} ${hh}:${mm}`;
+        saveState();
+        renderAll();
+      }
+    });
+
+    scheduledGrid.appendChild(card);
+  });
+}
+
+/* ---------------------------
+   Live ticking
+----------------------------*/
+function tick(){
+  const now = new Date();
+
+  // manual timers
+  document.querySelectorAll("[data-manual-timer]").forEach(el => {
+    const idx = Number(el.getAttribute("data-manual-timer"));
+    const b = state.manual[idx];
+    const next = getManualNextTime(b);
+
+    if(!next){
+      el.textContent = "00:00:00";
+      return;
+    }
+    const diff = next - now;
+    el.textContent = msToClock(diff);
+  });
+
+  document.querySelectorAll("[data-manual-next]").forEach(el => {
+    const idx = Number(el.getAttribute("data-manual-next"));
+    const next = getManualNextTime(state.manual[idx]);
+    el.textContent = next ? formatClock(next) : "--:-- --";
+  });
+
+  // scheduled timers
+  document.querySelectorAll("[data-sched-timer]").forEach(el => {
+    const idx = Number(el.getAttribute("data-sched-timer"));
+    const b = state.scheduled[idx];
+    const next = nextOccurrenceFromRule(b.rule, now);
+
+    if(!next){
+      el.textContent = "00:00:00";
+      return;
+    }
+    el.textContent = msToClock(next - now);
+  });
+
+  document.querySelectorAll("[data-sched-next]").forEach(el => {
+    const idx = Number(el.getAttribute("data-sched-next"));
+    const next = nextOccurrenceFromRule(state.scheduled[idx].rule, now);
+    el.textContent = next ? formatClock(next) : "--:-- --";
+  });
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function escapeAttr(str){
+  // safe for value=""
+  return escapeHtml(str).replaceAll("\n"," ");
+}
+
+/* boot */
+renderAll();
+tick();
+setInterval(tick, 250);
+</script>
+</body>
+</html>
