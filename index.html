@@ -255,55 +255,61 @@
     }
 
     /* Next Boss banner */
-    .nextBossBanner{
-      position: fixed;
-      top: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
+.nextBossBanner{
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
 
-      width: min(720px, calc(100vw - 28px));
-      border-radius: 999px;
-      padding: 16px 18px;
+  width: min(720px, calc(100vw - 28px));
+  border-radius: 999px;
+  padding: 16px 18px;
 
-      border: 1px solid rgba(242,211,138,.55);
-      background:
-        radial-gradient(900px 300px at 20% 20%, rgba(202,162,74,.22), transparent 60%),
-        radial-gradient(700px 260px at 90% 10%, rgba(242,211,138,.18), transparent 55%),
-        linear-gradient(90deg, rgba(202,162,74,.18), rgba(242,211,138,.14));
-      box-shadow: 0 18px 70px rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
+  border: 1px solid rgba(242,211,138,.55);
+  background:
+    radial-gradient(900px 300px at 20% 20%, rgba(202,162,74,.22), transparent 60%),
+    radial-gradient(700px 260px at 90% 10%, rgba(242,211,138,.18), transparent 55%),
+    linear-gradient(90deg, rgba(202,162,74,.18), rgba(242,211,138,.14));
+  box-shadow: 0 18px 70px rgba(0,0,0,.65);
+  backdrop-filter: blur(8px);
 
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 14px;
-    }
+  display:flex;
+  align-items:center;
+  justify-content: center; /* ✅ CENTER CONTENT */
+  gap: 14px;
+}
 
-    .nextBossLeft{
-      display:flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 0;
-    }
-    .nextBossTitle{
-      font-size: 34px;
-      font-weight: 900;
-      letter-spacing: .2px;
-      line-height: 1.05;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .nextBossSub{
-      display:flex;
-      gap: 12px;
-      align-items:center;
-      flex-wrap: wrap;
-    }
+.nextBossLeft{
+  display:flex;
+  flex-direction: column;
+  align-items: center;     /* ✅ CENTER COLUMN */
+  text-align: center;      /* ✅ CENTER TEXT */
+  gap: 6px;
+  min-width: 0;
+}
+
+.nextBossTitle{
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: .2px;
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center; /* ✅ CENTER TITLE */
+}
+
+.nextBossSub{
+  display:flex;
+  gap: 12px;
+  align-items:center;
+  justify-content: center; /* ✅ CENTER COUNTDOWN ROW */
+  flex-wrap: wrap;
+}
 
     .nbPill{
-      display:flex;
+      display:center;
       align-items:center;
       gap: 10px;
       border-radius: 999px;
@@ -343,7 +349,7 @@
 
 <body>
   <div id="nextBossBanner" class="nextBossBanner hidden" aria-live="polite">
-    <div class="nextBossLeft">
+    <div class="nextBossCenter">
       <div class="nextBossTitle">Next Boss: <span id="nbName">—</span></div>
       <div class="nextBossSub">
         <div class="nbPill" title="Next spawn time (PH time)">
