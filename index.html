@@ -372,7 +372,7 @@
         <input class="input" id="manualName" placeholder="Boss Name" />
         <input class="input" id="manualHours" placeholder="Hours" type="number" step="0.01" min="0" />
         <button class="btn primary" id="addManual">Add Manual Timer</button>
-        <button class="btn" id="resetAll">Reset All</button>
+        <button class="btn" id="resetAll">Reset All Timers (for maintenance only)</button>
       </div>
       <div class="hint">Manual bosses: set a respawn in hours. Use <span class="muted">Killed Now</span> to start the countdown.</div>
     </div>
@@ -494,9 +494,19 @@ function saveState(){
   localStorage.setItem(LS_KEY, JSON.stringify(state));
 }
 
-function resetAll(){
-  state.manual = ensureIds(structuredClone(DEFAULT_MANUAL));
-  state.scheduled = ensureIds(structuredClone(DEFAULT_SCHEDULED));
+/* ✅ NEW: Reset All now resets ONLY manual timers back to default "not started" state */
+function resetAllManualTimers(){
+  // keep the list/boss names/hours, but reset timer values
+  state.manual = state.manual.map(b => ({
+    ...b,
+    lastKill: null,
+    lastRestart: new Date().toISOString()
+  }));
+
+  // cancel any pending auto-reset timers
+  for(const t of pendingAutoResets.values()) clearTimeout(t);
+  pendingAutoResets.clear();
+
   saveState();
   renderAll();
 }
@@ -596,11 +606,8 @@ const pendingAutoResets = new Map(); // id -> timeoutId
 
 function scheduleAutoResetIfExpired(manualBoss, diffMs){
   if(!manualBoss?.id) return;
-
-  // Only if we have a kill time (i.e. it's a real countdown)
   if(!manualBoss.lastKill) return;
 
-  // Expired or at 0
   if(diffMs <= 0){
     if(pendingAutoResets.has(manualBoss.id)) return;
 
@@ -625,7 +632,6 @@ function scheduleAutoResetIfExpired(manualBoss, diffMs){
 
     pendingAutoResets.set(manualBoss.id, t);
   } else {
-    // If user updated the timer back to running, cancel any pending reset
     const t = pendingAutoResets.get(manualBoss.id);
     if(t){
       clearTimeout(t);
@@ -643,20 +649,18 @@ const nbClockEl = document.getElementById("nbClock");
 const nbCountdownEl = document.getElementById("nbCountdown");
 
 function updateNextBossBanner(now){
-  let best = null; // {name, nextDate, diffMs}
+  let best = null;
 
-  // Manual bosses
   for(const b of state.manual){
     const next = getManualNextTime(b);
     if(!next) continue;
     const diff = next - now;
-    if(diff <= 0) continue; // only bosses that will respawn (upcoming)
+    if(diff <= 0) continue;
     if(!best || diff < best.diffMs){
       best = { name: b.name, nextDate: next, diffMs: diff };
     }
   }
 
-  // Scheduled bosses
   for(const b of state.scheduled){
     const next = nextOccurrenceFromRule(b.rule, now);
     if(!next) continue;
@@ -717,8 +721,11 @@ document.getElementById("addScheduled").addEventListener("click", () => {
   renderAll();
 });
 
+/* ✅ MERGED: Reset All now resets manual timers only */
 document.getElementById("resetAll").addEventListener("click", () => {
-  if(confirm("Reset everything to defaults?")) resetAll();
+  if(confirm("Reset all Manual Boss Timers back to default?")){
+    resetAllManualTimers();
+  }
 });
 
 function manualKilledNow(id){
@@ -949,7 +956,6 @@ function setTimerColor(el, diffMs){
 function tick(){
   const now = new Date();
 
-  // Update banner (PH time display)
   updateNextBossBanner(now);
 
   // Manual timers
@@ -970,8 +976,6 @@ function tick(){
     const diff = next - now;
     el.textContent = msToClock(diff);
     setTimerColor(el, diff);
-
-    // Auto reset after 30s if expired
     scheduleAutoResetIfExpired(b, diff);
   });
 
