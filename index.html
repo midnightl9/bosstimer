@@ -456,7 +456,7 @@ function ensureIds(arr){
   return arr.map(x => (x && x.id) ? x : ({ ...x, id: uid() }));
 }
 
-/* ✅ FIX: Normalize/repair manual hours coming from localStorage */
+/* ✅ NEW: Normalize/repair manual hours coming from localStorage (keeps per-boss hours) */
 function normalizeManual(manualArr){
   const defaultByName = new Map(DEFAULT_MANUAL.map(d => [d.name.toLowerCase(), d.hours]));
 
@@ -497,15 +497,36 @@ function loadState(){
 }
 
 let state = loadState();
-
-/* ✅ FIX: Repair already-corrupted saved data immediately */
-function repairManualHoursNow(){
-  state.manual = normalizeManual(state.manual);
-  saveState();
-}
-repairManualHoursNow();
-
 function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+
+/* ✅ EDGE FIX: Hard-repair manual hours from DEFAULT_MANUAL (keeps kill times) */
+(function edgeRepairHours(){
+  const defaultByName = new Map(DEFAULT_MANUAL.map(d => [d.name.toLowerCase(), d.hours]));
+  let changed = false;
+
+  state.manual = state.manual.map(b => {
+    const def = defaultByName.get(String(b.name || "").toLowerCase());
+
+    // If boss exists in defaults, force the correct hours from defaults
+    if(Number.isFinite(def) && b.hours !== def){
+      changed = true;
+      return { ...b, hours: def };
+    }
+
+    // Otherwise coerce to number
+    const coerced = Number(b.hours);
+    if(Number.isFinite(coerced) && coerced !== b.hours){
+      changed = true;
+      return { ...b, hours: coerced };
+    }
+
+    return b;
+  });
+
+  if(changed){
+    saveState();
+  }
+})();
 
 /* ---------------------------
    Date helpers
@@ -620,7 +641,7 @@ function scheduleAutoResetIfExpired(manualBoss, diffMs){
   }
 }
 
-/* ✅ Reset All = act like "Killed Now" for ALL manual bosses */
+/* ✅ MERGED: Reset All = act like "Killed Now" for ALL manual bosses */
 function resetAllManualTimers(){
   const now = new Date().toISOString();
 
