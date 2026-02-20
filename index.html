@@ -455,21 +455,56 @@ function uid(){
 function ensureIds(arr){
   return arr.map(x => (x && x.id) ? x : ({ ...x, id: uid() }));
 }
+
+/* ✅ FIX: Normalize/repair manual hours coming from localStorage */
+function normalizeManual(manualArr){
+  const defaultByName = new Map(DEFAULT_MANUAL.map(d => [d.name.toLowerCase(), d.hours]));
+
+  return ensureIds(manualArr).map(b => {
+    let h = Number(b.hours);
+
+    if(!Number.isFinite(h) || h <= 0){
+      const fallback = defaultByName.get(String(b.name || "").toLowerCase());
+      if(Number.isFinite(fallback)) h = fallback;
+    }
+
+    if(!Number.isFinite(h) || h <= 0){
+      h = 24; // final fallback
+    }
+
+    return { ...b, hours: h };
+  });
+}
+
 function loadState(){
   try{
     const raw = localStorage.getItem(LS_KEY);
     if(!raw){
-      return { manual: ensureIds(DEFAULT_MANUAL), scheduled: ensureIds(DEFAULT_SCHEDULED) };
+      return { manual: normalizeManual(DEFAULT_MANUAL), scheduled: ensureIds(DEFAULT_SCHEDULED) };
     }
     const parsed = JSON.parse(raw);
-    const manual = ensureIds(Array.isArray(parsed.manual) ? parsed.manual : DEFAULT_MANUAL);
-    const scheduled = ensureIds(Array.isArray(parsed.scheduled) ? parsed.scheduled : DEFAULT_SCHEDULED);
-    return { manual, scheduled };
+
+    const manualRaw = Array.isArray(parsed.manual) ? parsed.manual : DEFAULT_MANUAL;
+    const scheduledRaw = Array.isArray(parsed.scheduled) ? parsed.scheduled : DEFAULT_SCHEDULED;
+
+    return {
+      manual: normalizeManual(manualRaw),
+      scheduled: ensureIds(scheduledRaw)
+    };
   }catch{
-    return { manual: ensureIds(DEFAULT_MANUAL), scheduled: ensureIds(DEFAULT_SCHEDULED) };
+    return { manual: normalizeManual(DEFAULT_MANUAL), scheduled: ensureIds(DEFAULT_SCHEDULED) };
   }
 }
+
 let state = loadState();
+
+/* ✅ FIX: Repair already-corrupted saved data immediately */
+function repairManualHoursNow(){
+  state.manual = normalizeManual(state.manual);
+  saveState();
+}
+repairManualHoursNow();
+
 function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 
 /* ---------------------------
@@ -585,7 +620,7 @@ function scheduleAutoResetIfExpired(manualBoss, diffMs){
   }
 }
 
-/* ✅ MERGED: Reset All = act like "Killed Now" for ALL manual bosses */
+/* ✅ Reset All = act like "Killed Now" for ALL manual bosses */
 function resetAllManualTimers(){
   const now = new Date().toISOString();
 
