@@ -30,11 +30,10 @@
         linear-gradient(180deg, var(--bg0), var(--bg1));
       color:var(--text);
       padding:24px;
-      padding-top: 120px; /* space for banner */
+      padding-top: 120px;
     }
 
     h2{ margin:0 0 14px 0; letter-spacing:.2px; }
-
     .wrap{ max-width: 1600px; margin: 0 auto; }
 
     .section{
@@ -51,7 +50,6 @@
       margin-bottom: 14px;
     }
 
-    /* Inputs/Buttons */
     .input, .btn{
       height: 34px;
       border-radius: 8px;
@@ -81,7 +79,6 @@
       border-color: rgba(120,170,255,.35);
     }
 
-    /* Grid */
     .grid{
       display:grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -89,7 +86,6 @@
       align-items: stretch;
     }
 
-    /* Cards */
     .card{
       position: relative;
       border-radius: var(--radius);
@@ -103,7 +99,7 @@
       gap: 8px;
       min-height: 0;
 
-      border: 2px solid rgba(202,162,74,.85); /* GOLD OUTER BORDER */
+      border: 2px solid rgba(202,162,74,.85);
     }
 
     .card::before{
@@ -258,7 +254,7 @@
       font-weight: 900;
     }
 
-    /* ===== NEXT BOSS BANNER (top center, gold) ===== */
+    /* Next Boss banner */
     .nextBossBanner{
       position: fixed;
       top: 18px;
@@ -346,8 +342,6 @@
 </head>
 
 <body>
-
-  <!-- Next Boss banner -->
   <div id="nextBossBanner" class="nextBossBanner hidden" aria-live="polite">
     <div class="nextBossLeft">
       <div class="nextBossTitle">Next Boss: <span id="nbName">—</span></div>
@@ -362,42 +356,38 @@
     </div>
   </div>
 
-<div class="wrap">
-
-  <!-- MANUAL -->
-  <div class="section" id="manualSection">
-    <div class="sectionTitle">
-      <h2>Manual Boss Timers</h2>
-      <div class="toolbar">
-        <input class="input" id="manualName" placeholder="Boss Name" />
-        <input class="input" id="manualHours" placeholder="Hours" type="number" step="0.01" min="0" />
-        <button class="btn primary" id="addManual">Add Manual Timer</button>
-        <button class="btn" id="resetAll">Reset All Timers (for maintenance only)</button>
+  <div class="wrap">
+    <div class="section" id="manualSection">
+      <div class="sectionTitle">
+        <h2>Manual Boss Timers</h2>
+        <div class="toolbar">
+          <input class="input" id="manualName" placeholder="Boss Name" />
+          <input class="input" id="manualHours" placeholder="Hours" type="number" step="0.01" min="0" />
+          <button class="btn primary" id="addManual">Add Manual Timer</button>
+          <button class="btn" id="resetAll">Reset All</button>
+        </div>
+        <div class="hint">Manual bosses: set a respawn in hours. Use <span class="muted">Killed Now</span> to start the countdown.</div>
       </div>
-      <div class="hint">Manual bosses: set a respawn in hours. Use <span class="muted">Killed Now</span> to start the countdown.</div>
+
+      <div class="grid" id="manualGrid"></div>
     </div>
 
-    <div class="grid" id="manualGrid"></div>
-  </div>
+    <div class="section" id="scheduledSection">
+      <div class="sectionTitle">
+        <h2>Scheduled Bosses</h2>
+        <div class="toolbar">
+          <input class="input" id="schedName" placeholder="Boss Name" />
+          <input class="input" id="schedRule" placeholder="Schedule e.g. mon 12:30, tue 19:00" />
+          <button class="btn primary" id="addScheduled">Add Scheduled Boss</button>
+        </div>
+        <div class="hint">
+          Scheduled bosses: write times like <span class="muted">mon 19:00, wed 11:30, thu 11:30</span>. 24-hour time recommended.
+        </div>
+      </div>
 
-  <!-- SCHEDULED -->
-  <div class="section" id="scheduledSection">
-    <div class="sectionTitle">
-      <h2>Scheduled Bosses</h2>
-      <div class="toolbar">
-        <input class="input" id="schedName" placeholder="Boss Name" />
-        <input class="input" id="schedRule" placeholder="Schedule e.g. mon 12:30, tue 19:00" />
-        <button class="btn primary" id="addScheduled">Add Scheduled Boss</button>
-      </div>
-      <div class="hint">
-        Scheduled bosses: write times like <span class="muted">mon 19:00, wed 11:30, thu 11:30</span>. 24-hour time recommended.
-      </div>
+      <div class="grid" id="scheduledGrid"></div>
     </div>
-
-    <div class="grid" id="scheduledGrid"></div>
   </div>
-
-</div>
 
 <script>
 /* ===========================
@@ -408,20 +398,14 @@ const PH_TZ = "Asia/Manila";
 const phClockFmt = new Intl.DateTimeFormat("en-US", {
   timeZone: PH_TZ, hour: "2-digit", minute: "2-digit", hour12: true
 });
-
 const phShortFmt = new Intl.DateTimeFormat("en-US", {
   timeZone: PH_TZ,
   year: "numeric", month: "numeric", day: "numeric",
   hour: "numeric", minute: "2-digit", second: "2-digit",
   hour12: true
 });
-
-function formatClockPH(dt){
-  return phClockFmt.format(dt);
-}
-function formatShortPH(dt){
-  return phShortFmt.format(dt);
-}
+function formatClockPH(dt){ return phClockFmt.format(dt); }
+function formatShortPH(dt){ return phShortFmt.format(dt); }
 
 /* ---------------------------
    Storage + defaults
@@ -429,28 +413,28 @@ function formatShortPH(dt){
 const LS_KEY = "bossTimers_v1";
 
 const DEFAULT_MANUAL = [
-  { name:"Baron Braudmore", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:45:01" },
-  { name:"Gareth", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:45:52" },
-  { name:"Lady Dalia", hours: 6, lastKill: null, lastRestart: null },
-  { name:"Ego", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:35:09" },
-  { name:"Livera", hours: 6, lastKill: null, lastRestart: null },
-  { name:"Araneo", hours: 6, lastKill: null, lastRestart: null },
-  { name:"Undomiel", hours: 6, lastKill: null, lastRestart: null },
-  { name:"Amentis", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:44:17" },
-  { name:"General Aquleus", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:44:35" },
-  { name:"Larba", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:50:28" },
-  { name:"Shuliar", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:50:41" },
-  { name:"Catena", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:51:06" },
-  { name:"Venatus", hours: 6, lastKill: null, lastRestart: "2026-01-13T19:34:08" },
-  { name:"Viorent", hours: 6, lastKill: null, lastRestart: "2026-01-13T19:34:24" },
-  { name:"Titore", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:42:46" },
-  { name:"Duplican", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:46:57" },
-  { name:"Metus", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:47:15" },
-  { name:"Wannitas", hours: 6, lastKill: null, lastRestart: "2026-01-13T17:47:29" },
-  { name:"Secreta", hours: 6, lastKill: null, lastRestart: "2026-01-13T18:47:49" },
-  { name:"Ordo", hours: 6, lastKill: null, lastRestart: "2026-01-13T18:47:53" },
-  { name:"Asta", hours: 6, lastKill: null, lastRestart: "2026-01-13T18:48:00" },
-  { name:"Supore", hours: 72, lastKill: "2026-02-20T01:57:18", lastRestart: "2026-02-20T01:57:18" }
+  { name:"Baron Braudmore", hours: 32, lastKill: null, lastRestart: "2026-01-13T17:45:01" },
+  { name:"Gareth", hours: 32, lastKill: null, lastRestart: "2026-01-13T17:45:52" },
+  { name:"Lady Dalia", hours: 18, lastKill: null, lastRestart: null },
+  { name:"Ego", hours: 21, lastKill: null, lastRestart: "2026-01-13T17:35:09" },
+  { name:"Livera", hours: 24, lastKill: null, lastRestart: null },
+  { name:"Araneo", hours: 24, lastKill: null, lastRestart: null },
+  { name:"Undomiel", hours: 24, lastKill: null, lastRestart: null },
+  { name:"Amentis", hours: 29, lastKill: null, lastRestart: "2026-01-13T17:44:17" },
+  { name:"General Aquleus", hours: 29, lastKill: null, lastRestart: "2026-01-13T17:44:35" },
+  { name:"Larba", hours: 35, lastKill: null, lastRestart: "2026-01-13T17:50:28" },
+  { name:"Shuliar", hours: 35, lastKill: null, lastRestart: "2026-01-13T17:50:41" },
+  { name:"Catena", hours: 35, lastKill: null, lastRestart: "2026-01-13T17:51:06" },
+  { name:"Venatus", hours: 10, lastKill: null, lastRestart: "2026-01-13T19:34:08" },
+  { name:"Viorent", hours: 10, lastKill: null, lastRestart: "2026-01-13T19:34:24" },
+  { name:"Titore", hours: 37, lastKill: null, lastRestart: "2026-01-13T17:42:46" },
+  { name:"Duplican", hours: 48, lastKill: null, lastRestart: "2026-01-13T17:46:57" },
+  { name:"Metus", hours: 48, lastKill: null, lastRestart: "2026-01-13T17:47:15" },
+  { name:"Wannitas", hours: 48, lastKill: null, lastRestart: "2026-01-13T17:47:29" },
+  { name:"Secreta", hours: 62, lastKill: null, lastRestart: "2026-01-13T18:47:49" },
+  { name:"Ordo", hours: 62, lastKill: null, lastRestart: "2026-01-13T18:47:53" },
+  { name:"Asta", hours: 62, lastKill: null, lastRestart: "2026-01-13T18:48:00" },
+  { name:"Supore", hours: 62, lastKill: "2026-02-20T01:57:18", lastRestart: "2026-02-20T01:57:18" }
 ];
 
 const DEFAULT_SCHEDULED = [
@@ -468,11 +452,9 @@ function uid(){
   if (window.crypto?.randomUUID) return crypto.randomUUID();
   return "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
 }
-
 function ensureIds(arr){
   return arr.map(x => (x && x.id) ? x : ({ ...x, id: uid() }));
 }
-
 function loadState(){
   try{
     const raw = localStorage.getItem(LS_KEY);
@@ -487,54 +469,27 @@ function loadState(){
     return { manual: ensureIds(DEFAULT_MANUAL), scheduled: ensureIds(DEFAULT_SCHEDULED) };
   }
 }
-
 let state = loadState();
-
-function saveState(){
-  localStorage.setItem(LS_KEY, JSON.stringify(state));
-}
-
-/* ✅ NEW: Reset All now resets ONLY manual timers back to default "not started" state */
-function resetAllManualTimers(){
-  // keep the list/boss names/hours, but reset timer values
-  state.manual = state.manual.map(b => ({
-    ...b,
-    lastKill: null,
-    lastRestart: new Date().toISOString()
-  }));
-
-  // cancel any pending auto-reset timers
-  for(const t of pendingAutoResets.values()) clearTimeout(t);
-  pendingAutoResets.clear();
-
-  saveState();
-  renderAll();
-}
+function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 
 /* ---------------------------
    Date helpers
 ----------------------------*/
 const DOW = { sun:0, mon:1, tue:2, wed:3, thu:4, fri:5, sat:6 };
-
 function pad(n){ return String(n).padStart(2,"0"); }
-
 function msToClock(ms){
   const neg = ms < 0;
   ms = Math.abs(ms);
-
   const sec = Math.floor(ms / 1000);
   const days = Math.floor(sec / 86400);
   const hours = Math.floor((sec % 86400)/3600);
   const mins = Math.floor((sec % 3600)/60);
   const secs = sec % 60;
-
   const out = (days > 0)
     ? `${days}:${pad(hours)}:${pad(mins)}:${pad(secs)}`
     : `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
-
   return neg ? `-${out}` : out;
 }
-
 function parseScheduleRule(ruleStr){
   const parts = ruleStr.split(",").map(s => s.trim()).filter(Boolean);
   const out = [];
@@ -549,25 +504,19 @@ function parseScheduleRule(ruleStr){
   }
   return out;
 }
-
 function nextOccurrenceFromRule(ruleStr, fromDate = new Date()){
   const rules = parseScheduleRule(ruleStr);
   if(rules.length === 0) return null;
-
   const now = new Date(fromDate);
   let best = null;
-
   for(const r of rules){
     const candidate = new Date(now);
     candidate.setSeconds(0,0);
     candidate.setHours(r.hour, r.min, 0, 0);
-
     const curDow = now.getDay();
     let addDays = (r.dow - curDow + 7) % 7;
-
     if(addDays === 0 && candidate <= now) addDays = 7;
     candidate.setDate(candidate.getDate() + addDays);
-
     if(!best || candidate < best) best = candidate;
   }
   return best;
@@ -578,16 +527,13 @@ function nextOccurrenceFromRule(ruleStr, fromDate = new Date()){
 ----------------------------*/
 function findManualIndexById(id){ return state.manual.findIndex(b => b.id === id); }
 function findScheduledIndexById(id){ return state.scheduled.findIndex(b => b.id === id); }
-
 function getManualNextTime(b){
   if(!b?.lastKill) return null;
   const kill = new Date(b.lastKill);
   return new Date(kill.getTime() + (b.hours * 3600 * 1000));
 }
 
-/* ---------------------------
-   Sorting helpers (LOWEST -> HIGHEST time remaining)
-----------------------------*/
+/* Sorting */
 function getManualDiffMs(b, now){
   const next = getManualNextTime(b);
   if(!next) return Number.POSITIVE_INFINITY;
@@ -602,8 +548,7 @@ function getScheduledDiffMs(b, now){
 /* ---------------------------
    Auto-reset manual when expired (after 30s)
 ----------------------------*/
-const pendingAutoResets = new Map(); // id -> timeoutId
-
+const pendingAutoResets = new Map();
 function scheduleAutoResetIfExpired(manualBoss, diffMs){
   if(!manualBoss?.id) return;
   if(!manualBoss.lastKill) return;
@@ -640,8 +585,25 @@ function scheduleAutoResetIfExpired(manualBoss, diffMs){
   }
 }
 
+/* ✅ MERGED: Reset All = act like "Killed Now" for ALL manual bosses */
+function resetAllManualTimers(){
+  const now = new Date().toISOString();
+
+  state.manual = state.manual.map(b => ({
+    ...b,
+    lastKill: now,
+    lastRestart: now
+  }));
+
+  for(const t of pendingAutoResets.values()) clearTimeout(t);
+  pendingAutoResets.clear();
+
+  saveState();
+  renderAll();
+}
+
 /* ---------------------------
-   UI banner: Next Boss (soonest upcoming, diff>0)
+   Next Boss banner
 ----------------------------*/
 const bannerEl = document.getElementById("nextBossBanner");
 const nbNameEl = document.getElementById("nbName");
@@ -683,7 +645,7 @@ function updateNextBossBanner(now){
 }
 
 /* ---------------------------
-   App state wiring
+   App wiring
 ----------------------------*/
 const manualGrid = document.getElementById("manualGrid");
 const scheduledGrid = document.getElementById("scheduledGrid");
@@ -692,7 +654,6 @@ document.getElementById("addManual").addEventListener("click", () => {
   const name = document.getElementById("manualName").value.trim();
   const hoursStr = document.getElementById("manualHours").value.trim();
   const hours = Number(hoursStr);
-
   if(!name || !Number.isFinite(hours) || hours <= 0) return;
 
   state.manual.unshift({
@@ -721,9 +682,9 @@ document.getElementById("addScheduled").addEventListener("click", () => {
   renderAll();
 });
 
-/* ✅ MERGED: Reset All now resets manual timers only */
+/* ✅ Reset All button now restarts all manual timers (like clicking Killed Now on each) */
 document.getElementById("resetAll").addEventListener("click", () => {
-  if(confirm("Reset all Manual Boss Timers back to default?")){
+  if(confirm("Restart ALL Manual Boss Timers now?")){
     resetAllManualTimers();
   }
 });
@@ -778,7 +739,7 @@ function manualSetNext(id){
 }
 
 /* ---------------------------
-   Rendering (sorted lowest -> highest remaining)
+   Rendering
 ----------------------------*/
 function renderAll(){
   renderManual();
@@ -841,6 +802,7 @@ function renderManual(){
     card.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action]");
       if(!btn) return;
+
       const action = btn.dataset.action;
       const bossId = btn.dataset.id;
 
@@ -955,10 +917,8 @@ function setTimerColor(el, diffMs){
 
 function tick(){
   const now = new Date();
-
   updateNextBossBanner(now);
 
-  // Manual timers
   document.querySelectorAll("[data-manual-timer]").forEach(el => {
     const id = el.getAttribute("data-manual-timer");
     const idx = findManualIndexById(id);
@@ -988,7 +948,6 @@ function tick(){
     el.textContent = next ? formatClockPH(next) : "--:-- --";
   });
 
-  // Scheduled timers
   document.querySelectorAll("[data-sched-timer]").forEach(el => {
     const id = el.getAttribute("data-sched-timer");
     const idx = findScheduledIndexById(id);
