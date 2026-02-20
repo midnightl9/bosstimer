@@ -86,6 +86,45 @@
       align-items: stretch;
     }
 
+    /* ✅ Center all card text */
+    .card{
+      text-align: center;        /* centers all text inside the card */
+      align-items: center;       /* centers child blocks horizontally (flex column) */
+    }
+
+    /* ✅ Center the top row (boss name + pill) */
+    .topRow{
+      justify-content: center;   /* centers the whole row */
+      align-items: center;
+      flex-wrap: wrap;           /* prevents weird overflow on smaller widths */
+    }
+
+    /* ✅ Boss name slightly bigger */
+    .bossName{
+      font-size: 14px;           /* was 12px */
+      text-align: center;
+    }
+
+    /* ✅ Keep timers + lines centered nicely */
+    .timer,
+    .nextLine,
+    .footer{
+      text-align: center;
+      width: 100%;
+    }
+
+    /* ✅ Center button stack + controls */
+    .controls,
+    .btnStack{
+      width: 100%;
+      justify-items: center;     /* for grid */
+    }
+
+    /* ✅ Center the schedule input row better (Scheduled cards) */
+    .controls input.input{
+      text-align: center;
+    }
+
     .card{
       position: relative;
       border-radius: var(--radius);
