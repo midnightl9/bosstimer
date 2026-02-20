@@ -8,18 +8,16 @@
     :root{
       --bg0:#050608;
       --bg1:#0a0c10;
-      --panel:#0c0f14;
       --text:#e8e8ea;
       --muted:#9aa0a6;
 
       --accentRed:#ff3b3b;
       --accentGold:#caa24a;
       --accentGold2:#f2d38a;
-      --accentGreen:#34d399; /* green for running */
+      --accentGreen:#34d399;
 
       --shadow: 0 20px 60px rgba(0,0,0,.55);
       --radius: 14px;
-      --radius2: 10px;
     }
 
     *{box-sizing:border-box}
@@ -32,17 +30,12 @@
         linear-gradient(180deg, var(--bg0), var(--bg1));
       color:var(--text);
       padding:24px;
+      padding-top: 120px; /* space for banner */
     }
 
-    h1,h2{
-      margin:0 0 14px 0;
-      letter-spacing:.2px;
-    }
+    h2{ margin:0 0 14px 0; letter-spacing:.2px; }
 
-    .wrap{
-      max-width: 1600px;
-      margin: 0 auto;
-    }
+    .wrap{ max-width: 1600px; margin: 0 auto; }
 
     .section{
       margin-bottom: 28px;
@@ -67,13 +60,10 @@
       color: var(--text);
       padding: 0 10px;
       outline:none;
-
       width: 100%;
       max-width: 100%;
     }
-    .input{
-      min-width: 150px;
-    }
+    .input{ min-width: 150px; }
     .btn{
       cursor:pointer;
       font-weight: 600;
@@ -85,7 +75,7 @@
       background: rgba(255,255,255,.09);
       border-color: rgba(255,255,255,.18);
     }
-    .btn:active{transform: translateY(1px)}
+    .btn:active{ transform: translateY(1px) }
     .btn.primary{
       background: rgba(120,170,255,.18);
       border-color: rgba(120,170,255,.35);
@@ -99,7 +89,7 @@
       align-items: stretch;
     }
 
-    /* ===== CARD FIXES (fits content inside borders) ===== */
+    /* Cards */
     .card{
       position: relative;
       border-radius: var(--radius);
@@ -113,11 +103,9 @@
       gap: 8px;
       min-height: 0;
 
-      /* GOLD OUTER BORDER FOR ALL CARDS */
-      border: 2px solid rgba(202,162,74,.85);
+      border: 2px solid rgba(202,162,74,.85); /* GOLD OUTER BORDER */
     }
 
-    /* Inner border */
     .card::before{
       content:"";
       position:absolute;
@@ -128,11 +116,7 @@
       opacity:.9;
     }
 
-    /* Keep all content above inner border */
-    .card > *{
-      position: relative;
-      z-index: 1;
-    }
+    .card > *{ position: relative; z-index: 1; }
 
     .topRow{
       display:flex;
@@ -186,7 +170,6 @@
       font-weight: 700;
     }
 
-    /* Controls rows fit inside card */
     .controls{
       display:grid;
       grid-template-columns: 1fr 44px;
@@ -202,9 +185,7 @@
       gap: 8px;
       min-width: 0;
     }
-    .dateRow .input{
-      min-width: 0;
-    }
+    .dateRow .input{ min-width: 0; }
 
     .miniBtn{
       width: 44px;
@@ -277,6 +258,86 @@
       font-weight: 900;
     }
 
+    /* ===== NEXT BOSS BANNER (top center, gold) ===== */
+    .nextBossBanner{
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+
+      width: min(720px, calc(100vw - 28px));
+      border-radius: 999px;
+      padding: 16px 18px;
+
+      border: 1px solid rgba(242,211,138,.55);
+      background:
+        radial-gradient(900px 300px at 20% 20%, rgba(202,162,74,.22), transparent 60%),
+        radial-gradient(700px 260px at 90% 10%, rgba(242,211,138,.18), transparent 55%),
+        linear-gradient(90deg, rgba(202,162,74,.18), rgba(242,211,138,.14));
+      box-shadow: 0 18px 70px rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .nextBossLeft{
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    .nextBossTitle{
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      line-height: 1.05;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nextBossSub{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+
+    .nbPill{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      border: 1px solid rgba(242,211,138,.28);
+      background: rgba(0,0,0,.28);
+      color: rgba(255,255,255,.95);
+      font-weight: 900;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+    .nbPill strong{
+      font-family: inherit;
+      font-weight: 900;
+    }
+    .nbCountdown{
+      border-color: rgba(52,211,153,.45);
+      background: rgba(0,0,0,.22);
+      color: var(--accentGreen);
+    }
+
+    .hidden{ display:none !important; }
+
+    @media (max-width: 520px){
+      body{ padding-top: 140px; }
+      .nextBossTitle{ font-size: 24px; }
+      .nbPill{ padding: 8px 12px; }
+    }
+
     @media (max-width: 420px){
       .controls{ grid-template-columns: 1fr 40px; }
       .miniBtn{ width: 40px; }
@@ -285,6 +346,22 @@
 </head>
 
 <body>
+
+  <!-- Next Boss banner -->
+  <div id="nextBossBanner" class="nextBossBanner hidden" aria-live="polite">
+    <div class="nextBossLeft">
+      <div class="nextBossTitle">Next Boss: <span id="nbName">—</span></div>
+      <div class="nextBossSub">
+        <div class="nbPill" title="Next spawn time (PH time)">
+          🕒 <strong id="nbClock">--:-- --</strong>
+        </div>
+        <div class="nbPill nbCountdown" title="Time remaining">
+          ⏳ <strong id="nbCountdown">00:00:00</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <div class="wrap">
 
   <!-- MANUAL -->
@@ -323,6 +400,29 @@
 </div>
 
 <script>
+/* ===========================
+   PH TIME helpers
+=========================== */
+const PH_TZ = "Asia/Manila";
+
+const phClockFmt = new Intl.DateTimeFormat("en-US", {
+  timeZone: PH_TZ, hour: "2-digit", minute: "2-digit", hour12: true
+});
+
+const phShortFmt = new Intl.DateTimeFormat("en-US", {
+  timeZone: PH_TZ,
+  year: "numeric", month: "numeric", day: "numeric",
+  hour: "numeric", minute: "2-digit", second: "2-digit",
+  hour12: true
+});
+
+function formatClockPH(dt){
+  return phClockFmt.format(dt);
+}
+function formatShortPH(dt){
+  return phShortFmt.format(dt);
+}
+
 /* ---------------------------
    Storage + defaults
 ----------------------------*/
@@ -364,25 +464,39 @@ const DEFAULT_SCHEDULED = [
   { name:"Neutro", rule:"tue 19:00, thu 19:00" }
 ];
 
+function uid(){
+  if (window.crypto?.randomUUID) return crypto.randomUUID();
+  return "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
+}
+
+function ensureIds(arr){
+  return arr.map(x => (x && x.id) ? x : ({ ...x, id: uid() }));
+}
+
 function loadState(){
   try{
     const raw = localStorage.getItem(LS_KEY);
-    if(!raw) return { manual: DEFAULT_MANUAL, scheduled: DEFAULT_SCHEDULED };
+    if(!raw){
+      return { manual: ensureIds(DEFAULT_MANUAL), scheduled: ensureIds(DEFAULT_SCHEDULED) };
+    }
     const parsed = JSON.parse(raw);
-    return {
-      manual: Array.isArray(parsed.manual) ? parsed.manual : DEFAULT_MANUAL,
-      scheduled: Array.isArray(parsed.scheduled) ? parsed.scheduled : DEFAULT_SCHEDULED
-    };
+    const manual = ensureIds(Array.isArray(parsed.manual) ? parsed.manual : DEFAULT_MANUAL);
+    const scheduled = ensureIds(Array.isArray(parsed.scheduled) ? parsed.scheduled : DEFAULT_SCHEDULED);
+    return { manual, scheduled };
   }catch{
-    return { manual: DEFAULT_MANUAL, scheduled: DEFAULT_SCHEDULED };
+    return { manual: ensureIds(DEFAULT_MANUAL), scheduled: ensureIds(DEFAULT_SCHEDULED) };
   }
 }
+
+let state = loadState();
+
 function saveState(){
   localStorage.setItem(LS_KEY, JSON.stringify(state));
 }
+
 function resetAll(){
-  state.manual = structuredClone(DEFAULT_MANUAL);
-  state.scheduled = structuredClone(DEFAULT_SCHEDULED);
+  state.manual = ensureIds(structuredClone(DEFAULT_MANUAL));
+  state.scheduled = ensureIds(structuredClone(DEFAULT_SCHEDULED));
   saveState();
   renderAll();
 }
@@ -393,26 +507,9 @@ function resetAll(){
 const DOW = { sun:0, mon:1, tue:2, wed:3, thu:4, fri:5, sat:6 };
 
 function pad(n){ return String(n).padStart(2,"0"); }
-function formatClock(dt){
-  const h = dt.getHours();
-  const m = dt.getMinutes();
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hh = h % 12 || 12;
-  return `${pad(hh)}:${pad(m)} ${ampm}`;
-}
-function formatShort(dt){
-  const mo = dt.getMonth()+1;
-  const da = dt.getDate();
-  const yr = dt.getFullYear();
-  const h = dt.getHours();
-  const m = dt.getMinutes();
-  const s = dt.getSeconds();
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hh = h % 12 || 12;
-  return `${mo}/${da}/${yr}, ${hh}:${pad(m)}:${pad(s)} ${ampm}`;
-}
 
 function msToClock(ms){
+  const neg = ms < 0;
   ms = Math.abs(ms);
 
   const sec = Math.floor(ms / 1000);
@@ -421,10 +518,11 @@ function msToClock(ms){
   const mins = Math.floor((sec % 3600)/60);
   const secs = sec % 60;
 
-  if(days > 0){
-    return `${days}:${pad(hours)}:${pad(mins)}:${pad(secs)}`;
-  }
-  return `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+  const out = (days > 0)
+    ? `${days}:${pad(hours)}:${pad(mins)}:${pad(secs)}`
+    : `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+
+  return neg ? `-${out}` : out;
 }
 
 function parseScheduleRule(ruleStr){
@@ -458,7 +556,6 @@ function nextOccurrenceFromRule(ruleStr, fromDate = new Date()){
     let addDays = (r.dow - curDow + 7) % 7;
 
     if(addDays === 0 && candidate <= now) addDays = 7;
-
     candidate.setDate(candidate.getDate() + addDays);
 
     if(!best || candidate < best) best = candidate;
@@ -467,10 +564,123 @@ function nextOccurrenceFromRule(ruleStr, fromDate = new Date()){
 }
 
 /* ---------------------------
-   App state
+   Manual logic
 ----------------------------*/
-let state = loadState();
+function findManualIndexById(id){ return state.manual.findIndex(b => b.id === id); }
+function findScheduledIndexById(id){ return state.scheduled.findIndex(b => b.id === id); }
 
+function getManualNextTime(b){
+  if(!b?.lastKill) return null;
+  const kill = new Date(b.lastKill);
+  return new Date(kill.getTime() + (b.hours * 3600 * 1000));
+}
+
+/* ---------------------------
+   Sorting helpers (LOWEST -> HIGHEST time remaining)
+----------------------------*/
+function getManualDiffMs(b, now){
+  const next = getManualNextTime(b);
+  if(!next) return Number.POSITIVE_INFINITY;
+  return next - now;
+}
+function getScheduledDiffMs(b, now){
+  const next = nextOccurrenceFromRule(b.rule, now);
+  if(!next) return Number.POSITIVE_INFINITY;
+  return next - now;
+}
+
+/* ---------------------------
+   Auto-reset manual when expired (after 30s)
+----------------------------*/
+const pendingAutoResets = new Map(); // id -> timeoutId
+
+function scheduleAutoResetIfExpired(manualBoss, diffMs){
+  if(!manualBoss?.id) return;
+
+  // Only if we have a kill time (i.e. it's a real countdown)
+  if(!manualBoss.lastKill) return;
+
+  // Expired or at 0
+  if(diffMs <= 0){
+    if(pendingAutoResets.has(manualBoss.id)) return;
+
+    const t = setTimeout(() => {
+      pendingAutoResets.delete(manualBoss.id);
+
+      const idx = findManualIndexById(manualBoss.id);
+      if(idx < 0) return;
+
+      const b = state.manual[idx];
+      const next = getManualNextTime(b);
+      const stillExpired = next ? (next - new Date()) <= 0 : false;
+
+      if(stillExpired){
+        const now = new Date();
+        state.manual[idx].lastKill = now.toISOString();
+        state.manual[idx].lastRestart = now.toISOString();
+        saveState();
+        renderAll();
+      }
+    }, 30000);
+
+    pendingAutoResets.set(manualBoss.id, t);
+  } else {
+    // If user updated the timer back to running, cancel any pending reset
+    const t = pendingAutoResets.get(manualBoss.id);
+    if(t){
+      clearTimeout(t);
+      pendingAutoResets.delete(manualBoss.id);
+    }
+  }
+}
+
+/* ---------------------------
+   UI banner: Next Boss (soonest upcoming, diff>0)
+----------------------------*/
+const bannerEl = document.getElementById("nextBossBanner");
+const nbNameEl = document.getElementById("nbName");
+const nbClockEl = document.getElementById("nbClock");
+const nbCountdownEl = document.getElementById("nbCountdown");
+
+function updateNextBossBanner(now){
+  let best = null; // {name, nextDate, diffMs}
+
+  // Manual bosses
+  for(const b of state.manual){
+    const next = getManualNextTime(b);
+    if(!next) continue;
+    const diff = next - now;
+    if(diff <= 0) continue; // only bosses that will respawn (upcoming)
+    if(!best || diff < best.diffMs){
+      best = { name: b.name, nextDate: next, diffMs: diff };
+    }
+  }
+
+  // Scheduled bosses
+  for(const b of state.scheduled){
+    const next = nextOccurrenceFromRule(b.rule, now);
+    if(!next) continue;
+    const diff = next - now;
+    if(diff <= 0) continue;
+    if(!best || diff < best.diffMs){
+      best = { name: b.name, nextDate: next, diffMs: diff };
+    }
+  }
+
+  if(!best){
+    bannerEl.classList.add("hidden");
+    return;
+  }
+
+  bannerEl.classList.remove("hidden");
+  nbNameEl.textContent = best.name;
+  nbClockEl.textContent = formatClockPH(best.nextDate);
+  nbCountdownEl.textContent = msToClock(best.diffMs);
+}
+
+/* ---------------------------
+   App state wiring
+----------------------------*/
 const manualGrid = document.getElementById("manualGrid");
 const scheduledGrid = document.getElementById("scheduledGrid");
 
@@ -482,6 +692,7 @@ document.getElementById("addManual").addEventListener("click", () => {
   if(!name || !Number.isFinite(hours) || hours <= 0) return;
 
   state.manual.unshift({
+    id: uid(),
     name,
     hours,
     lastKill: null,
@@ -499,7 +710,7 @@ document.getElementById("addScheduled").addEventListener("click", () => {
   const rule = document.getElementById("schedRule").value.trim();
   if(!name || !rule) return;
 
-  state.scheduled.unshift({ name, rule });
+  state.scheduled.unshift({ id: uid(), name, rule });
   document.getElementById("schedName").value = "";
   document.getElementById("schedRule").value = "";
   saveState();
@@ -507,22 +718,12 @@ document.getElementById("addScheduled").addEventListener("click", () => {
 });
 
 document.getElementById("resetAll").addEventListener("click", () => {
-  if(confirm("Reset everything to defaults?")){
-    resetAll();
-  }
+  if(confirm("Reset everything to defaults?")) resetAll();
 });
 
-/* ---------------------------
-   Manual logic
-----------------------------*/
-function getManualNextTime(b){
-  if(!b.lastKill) return null;
-  const kill = new Date(b.lastKill);
-  const next = new Date(kill.getTime() + (b.hours * 3600 * 1000));
-  return next;
-}
-
-function manualKilledNow(idx){
+function manualKilledNow(id){
+  const idx = findManualIndexById(id);
+  if(idx < 0) return;
   const now = new Date();
   state.manual[idx].lastKill = now.toISOString();
   state.manual[idx].lastRestart = now.toISOString();
@@ -530,12 +731,14 @@ function manualKilledNow(idx){
   renderAll();
 }
 
-function manualSetKill(idx){
-  const dateEl = document.getElementById(`mk_date_${idx}`);
-  const timeEl = document.getElementById(`mk_time_${idx}`);
-  const dateVal = dateEl.value;
-  const timeVal = timeEl.value;
+function manualSetKill(id){
+  const idx = findManualIndexById(id);
+  if(idx < 0) return;
 
+  const dateEl = document.getElementById(`mk_date_${id}`);
+  const timeEl = document.getElementById(`mk_time_${id}`);
+  const dateVal = dateEl?.value;
+  const timeVal = timeEl?.value;
   if(!dateVal || !timeVal) return;
 
   const dt = new Date(`${dateVal}T${timeVal}:00`);
@@ -547,12 +750,14 @@ function manualSetKill(idx){
   renderAll();
 }
 
-function manualSetNext(idx){
-  const dateEl = document.getElementById(`mn_date_${idx}`);
-  const timeEl = document.getElementById(`mn_time_${idx}`);
-  const dateVal = dateEl.value;
-  const timeVal = timeEl.value;
+function manualSetNext(id){
+  const idx = findManualIndexById(id);
+  if(idx < 0) return;
 
+  const dateEl = document.getElementById(`mn_date_${id}`);
+  const timeEl = document.getElementById(`mn_time_${id}`);
+  const dateVal = dateEl?.value;
+  const timeVal = timeEl?.value;
   if(!dateVal || !timeVal) return;
 
   const next = new Date(`${dateVal}T${timeVal}:00`);
@@ -566,7 +771,7 @@ function manualSetNext(idx){
 }
 
 /* ---------------------------
-   Rendering
+   Rendering (sorted lowest -> highest remaining)
 ----------------------------*/
 function renderAll(){
   renderManual();
@@ -575,11 +780,17 @@ function renderAll(){
 
 function renderManual(){
   manualGrid.innerHTML = "";
+  const now = new Date();
 
-  state.manual.forEach((b, idx) => {
+  const ordered = state.manual
+    .map(b => ({ b, diff: getManualDiffMs(b, now) }))
+    .sort((a, c) => (a.diff - c.diff) || a.b.name.localeCompare(c.b.name));
+
+  ordered.forEach(({ b }) => {
     const next = getManualNextTime(b);
-    const nextTxt = next ? formatClock(next) : "--:-- --";
+    const nextTxt = next ? formatClockPH(next) : "--:-- --";
 
+    const id = b.id;
     const card = document.createElement("div");
     card.className = "card manual";
 
@@ -589,33 +800,33 @@ function renderManual(){
         <div class="pill">${b.hours}h</div>
       </div>
 
-      <div class="timer red" data-manual-timer="${idx}">00:00:00</div>
-      <div class="nextLine">NEXT: <span data-manual-next="${idx}">${nextTxt}</span></div>
+      <div class="timer red" data-manual-timer="${escapeAttr(id)}">00:00:00</div>
+      <div class="nextLine">NEXT: <span data-manual-next="${escapeAttr(id)}">${nextTxt}</span></div>
 
       <div class="controls">
         <div class="dateRow">
-          <input class="input" id="mk_date_${idx}" type="date" />
-          <input class="input" id="mk_time_${idx}" type="time" />
+          <input class="input" id="mk_date_${escapeAttr(id)}" type="date" />
+          <input class="input" id="mk_time_${escapeAttr(id)}" type="time" />
         </div>
-        <button class="miniBtn" data-action="fillKill" data-idx="${idx}" title="Fill with now">🕒</button>
+        <button class="miniBtn" data-action="fillKill" data-id="${escapeAttr(id)}" title="Fill with now">🕒</button>
       </div>
 
       <div class="controls">
         <div class="dateRow">
-          <input class="input" id="mn_date_${idx}" type="date" />
-          <input class="input" id="mn_time_${idx}" type="time" />
+          <input class="input" id="mn_date_${escapeAttr(id)}" type="date" />
+          <input class="input" id="mn_time_${escapeAttr(id)}" type="time" />
         </div>
-        <button class="miniBtn" data-action="fillNext" data-idx="${idx}" title="Fill with next">⏱</button>
+        <button class="miniBtn" data-action="fillNext" data-id="${escapeAttr(id)}" title="Fill with next">⏱</button>
       </div>
 
       <div class="btnStack">
-        <button class="stackBtn" data-action="killedNow" data-idx="${idx}">Killed Now</button>
-        <button class="stackBtn" data-action="setKill" data-idx="${idx}">Set Kill</button>
-        <button class="stackBtn" data-action="setNext" data-idx="${idx}">Set Next</button>
+        <button class="stackBtn" data-action="killedNow" data-id="${escapeAttr(id)}">Killed Now</button>
+        <button class="stackBtn" data-action="setKill" data-id="${escapeAttr(id)}">Set Kill</button>
+        <button class="stackBtn" data-action="setNext" data-id="${escapeAttr(id)}">Set Next</button>
       </div>
 
       <div class="footer">
-        <div>Last restart: ${b.lastRestart ? escapeHtml(formatShort(new Date(b.lastRestart))) : "--"}</div>
+        <div>Last restart: ${b.lastRestart ? escapeHtml(formatShortPH(new Date(b.lastRestart))) : "--"}</div>
         <div class="muted">${b.lastKill ? "Kill set" : "No kill yet"}</div>
       </div>
     `;
@@ -624,21 +835,27 @@ function renderManual(){
       const btn = e.target.closest("[data-action]");
       if(!btn) return;
       const action = btn.dataset.action;
+      const bossId = btn.dataset.id;
 
-      if(action === "killedNow") manualKilledNow(idx);
-      if(action === "setKill") manualSetKill(idx);
-      if(action === "setNext") manualSetNext(idx);
+      if(action === "killedNow") manualKilledNow(bossId);
+      if(action === "setKill") manualSetKill(bossId);
+      if(action === "setNext") manualSetNext(bossId);
 
       if(action === "fillKill"){
-        const now = new Date();
-        document.getElementById(`mk_date_${idx}`).value = now.toISOString().slice(0,10);
-        document.getElementById(`mk_time_${idx}`).value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        const now2 = new Date();
+        const d = document.getElementById(`mk_date_${bossId}`);
+        const t = document.getElementById(`mk_time_${bossId}`);
+        if(d) d.value = now2.toISOString().slice(0,10);
+        if(t) t.value = `${pad(now2.getHours())}:${pad(now2.getMinutes())}`;
       }
 
       if(action === "fillNext"){
-        const nxt = getManualNextTime(state.manual[idx]) || new Date();
-        document.getElementById(`mn_date_${idx}`).value = nxt.toISOString().slice(0,10);
-        document.getElementById(`mn_time_${idx}`).value = `${pad(nxt.getHours())}:${pad(nxt.getMinutes())}`;
+        const idx = findManualIndexById(bossId);
+        const nxt = (idx >= 0) ? (getManualNextTime(state.manual[idx]) || new Date()) : new Date();
+        const d = document.getElementById(`mn_date_${bossId}`);
+        const t = document.getElementById(`mn_time_${bossId}`);
+        if(d) d.value = nxt.toISOString().slice(0,10);
+        if(t) t.value = `${pad(nxt.getHours())}:${pad(nxt.getMinutes())}`;
       }
     });
 
@@ -648,45 +865,56 @@ function renderManual(){
 
 function renderScheduled(){
   scheduledGrid.innerHTML = "";
+  const now = new Date();
 
-  state.scheduled.forEach((b, idx) => {
+  const ordered = state.scheduled
+    .map(b => ({ b, diff: getScheduledDiffMs(b, now) }))
+    .sort((a, c) => (a.diff - c.diff) || a.b.name.localeCompare(c.b.name));
+
+  ordered.forEach(({ b }) => {
     const next = nextOccurrenceFromRule(b.rule, new Date());
-    const nextTxt = next ? formatClock(next) : "--:-- --";
+    const nextTxt = next ? formatClockPH(next) : "--:-- --";
 
+    const id = b.id;
     const card = document.createElement("div");
     card.className = "card scheduled";
+
     card.innerHTML = `
       <div class="topRow">
         <div class="bossName">${escapeHtml(b.name)}</div>
         <div class="pill">Scheduled</div>
       </div>
 
-      <div class="timer red" data-sched-timer="${idx}">00:00:00</div>
-      <div class="nextLine">NEXT: <span data-sched-next="${idx}">${nextTxt}</span></div>
+      <div class="timer red" data-sched-timer="${escapeAttr(id)}">00:00:00</div>
+      <div class="nextLine">NEXT: <span data-sched-next="${escapeAttr(id)}">${nextTxt}</span></div>
 
       <div class="controls">
-        <input class="input" id="sr_${idx}" value="${escapeAttr(b.rule)}" />
-        <button class="miniBtn" data-action="saveRule" data-idx="${idx}">Save</button>
+        <input class="input" id="sr_${escapeAttr(id)}" value="${escapeAttr(b.rule)}" />
+        <button class="miniBtn" data-action="saveRule" data-id="${escapeAttr(id)}">Save</button>
       </div>
 
       <div class="btnStack">
-        <button class="stackBtn" data-action="setNextNow" data-idx="${idx}">Set Next</button>
+        <button class="stackBtn" data-action="setNextNow" data-id="${escapeAttr(id)}">Set Next</button>
       </div>
 
       <div class="footer">
         <div>Schedule: ${escapeHtml(b.rule)}</div>
-        <div class="muted">Local time</div>
+        <div class="muted">PH time</div>
       </div>
     `;
 
     card.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action]");
       if(!btn) return;
+
       const action = btn.dataset.action;
+      const bossId = btn.dataset.id;
+      const idx = findScheduledIndexById(bossId);
+      if(idx < 0) return;
 
       if(action === "saveRule"){
-        const inp = document.getElementById(`sr_${idx}`);
-        const val = inp.value.trim();
+        const inp = document.getElementById(`sr_${bossId}`);
+        const val = inp?.value.trim();
         if(!val) return;
         state.scheduled[idx].rule = val;
         saveState();
@@ -694,12 +922,12 @@ function renderScheduled(){
       }
 
       if(action === "setNextNow"){
-        const now = new Date();
-        now.setSeconds(0,0);
-        now.setMinutes(now.getMinutes() + 5);
-        const dowKey = Object.keys(DOW).find(k => DOW[k] === now.getDay()) || "mon";
-        const hh = pad(now.getHours());
-        const mm = pad(now.getMinutes());
+        const now2 = new Date();
+        now2.setSeconds(0,0);
+        now2.setMinutes(now2.getMinutes() + 5);
+        const dowKey = Object.keys(DOW).find(k => DOW[k] === now2.getDay()) || "mon";
+        const hh = pad(now2.getHours());
+        const mm = pad(now2.getMinutes());
         state.scheduled[idx].rule = `${dowKey} ${hh}:${mm}`;
         saveState();
         renderAll();
@@ -711,51 +939,63 @@ function renderScheduled(){
 }
 
 /* ---------------------------
-   Live ticking (GREEN running, RED out of time)
+   Live ticking
 ----------------------------*/
 function setTimerColor(el, diffMs){
   el.classList.remove("green","red");
-  if(diffMs > 0) el.classList.add("green");
-  else el.classList.add("red");
+  el.classList.add(diffMs > 0 ? "green" : "red");
 }
 
 function tick(){
   const now = new Date();
 
-  // manual timers
+  // Update banner (PH time display)
+  updateNextBossBanner(now);
+
+  // Manual timers
   document.querySelectorAll("[data-manual-timer]").forEach(el => {
-    const idx = Number(el.getAttribute("data-manual-timer"));
+    const id = el.getAttribute("data-manual-timer");
+    const idx = findManualIndexById(id);
+    if(idx < 0) return;
+
     const b = state.manual[idx];
     const next = getManualNextTime(b);
 
     if(!next){
       el.textContent = "00:00:00";
-      el.classList.remove("green","red");
-      el.classList.add("red");
+      setTimerColor(el, -1);
       return;
     }
 
     const diff = next - now;
     el.textContent = msToClock(diff);
     setTimerColor(el, diff);
+
+    // Auto reset after 30s if expired
+    scheduleAutoResetIfExpired(b, diff);
   });
 
   document.querySelectorAll("[data-manual-next]").forEach(el => {
-    const idx = Number(el.getAttribute("data-manual-next"));
+    const id = el.getAttribute("data-manual-next");
+    const idx = findManualIndexById(id);
+    if(idx < 0) return;
+
     const next = getManualNextTime(state.manual[idx]);
-    el.textContent = next ? formatClock(next) : "--:-- --";
+    el.textContent = next ? formatClockPH(next) : "--:-- --";
   });
 
-  // scheduled timers
+  // Scheduled timers
   document.querySelectorAll("[data-sched-timer]").forEach(el => {
-    const idx = Number(el.getAttribute("data-sched-timer"));
+    const id = el.getAttribute("data-sched-timer");
+    const idx = findScheduledIndexById(id);
+    if(idx < 0) return;
+
     const b = state.scheduled[idx];
     const next = nextOccurrenceFromRule(b.rule, now);
 
     if(!next){
       el.textContent = "00:00:00";
-      el.classList.remove("green","red");
-      el.classList.add("red");
+      setTimerColor(el, -1);
       return;
     }
 
@@ -765,9 +1005,12 @@ function tick(){
   });
 
   document.querySelectorAll("[data-sched-next]").forEach(el => {
-    const idx = Number(el.getAttribute("data-sched-next"));
+    const id = el.getAttribute("data-sched-next");
+    const idx = findScheduledIndexById(id);
+    if(idx < 0) return;
+
     const next = nextOccurrenceFromRule(state.scheduled[idx].rule, now);
-    el.textContent = next ? formatClock(next) : "--:-- --";
+    el.textContent = next ? formatClockPH(next) : "--:-- --";
   });
 }
 
