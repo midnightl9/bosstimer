@@ -15,6 +15,7 @@
       --accentRed:#ff3b3b;
       --accentGold:#caa24a;
       --accentGold2:#f2d38a;
+      --accentGreen:#34d399; /* green for running */
 
       --shadow: 0 20px 60px rgba(0,0,0,.55);
       --radius: 14px;
@@ -103,7 +104,7 @@
       position: relative;
       border-radius: var(--radius);
       padding: 12px;
-      overflow: hidden;  /* stops all bleeding */
+      overflow: hidden;
       background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
       box-shadow: var(--shadow);
 
@@ -111,14 +112,9 @@
       flex-direction: column;
       gap: 8px;
       min-height: 0;
-    }
 
-    /* Red outer + gold inner */
-    .card.manual{
-      border: 2px solid rgba(255,59,59,.75);
-    }
-    .card.scheduled{
-      border: 2px solid rgba(202,162,74,.60);
+      /* GOLD OUTER BORDER FOR ALL CARDS */
+      border: 2px solid rgba(202,162,74,.85);
     }
 
     /* Inner border */
@@ -127,7 +123,7 @@
       position:absolute;
       inset: 8px;
       border-radius: 10px;
-      border: 1px solid rgba(242,211,138,.22);
+      border: 1px solid rgba(242,211,138,.25);
       pointer-events:none;
       opacity:.9;
     }
@@ -143,7 +139,6 @@
       justify-content: space-between;
       align-items:flex-start;
       gap: 10px;
-      padding-right: 64px; /* space for DEL */
       margin-bottom: 2px;
     }
 
@@ -178,7 +173,7 @@
       margin: 0;
     }
     .timer.red{ color: var(--accentRed); }
-    .timer.white{ color: #ffffff; }
+    .timer.green{ color: var(--accentGreen); }
 
     .nextLine{
       font-size: 11px;
@@ -194,7 +189,7 @@
     /* Controls rows fit inside card */
     .controls{
       display:grid;
-      grid-template-columns: 1fr 44px; /* fixed icon button width */
+      grid-template-columns: 1fr 44px;
       gap: 8px;
       align-items:center;
       margin: 0;
@@ -208,7 +203,7 @@
       min-width: 0;
     }
     .dateRow .input{
-      min-width: 0; /* key: allow shrinking */
+      min-width: 0;
     }
 
     .miniBtn{
@@ -262,29 +257,6 @@
       margin-top: 2px;
     }
 
-    .dangerSmall{
-      position:absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 2;
-
-      border: 1px solid rgba(255,59,59,.45);
-      background: rgba(255,59,59,.10);
-      border-radius: 999px;
-      height: 24px;
-      padding: 0 10px;
-      color: rgba(255,255,255,.92);
-      font-weight: 900;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      gap: 6px;
-    }
-    .dangerSmall:hover{
-      background: rgba(255,59,59,.14);
-      border-color: rgba(255,59,59,.65);
-    }
-
     .muted{ color: var(--muted); }
 
     .hint{
@@ -294,7 +266,6 @@
       margin-bottom: 10px;
     }
 
-    /* Make the section headers look like the screenshot */
     .sectionTitle{
       display:flex;
       flex-direction:column;
@@ -306,11 +277,9 @@
       font-weight: 900;
     }
 
-    /* Mobile safety */
     @media (max-width: 420px){
       .controls{ grid-template-columns: 1fr 40px; }
       .miniBtn{ width: 40px; }
-      .topRow{ padding-right: 58px; }
     }
   </style>
 </head>
@@ -543,13 +512,6 @@ document.getElementById("resetAll").addEventListener("click", () => {
   }
 });
 
-function removeBoss(kind, idx){
-  if(!confirm("Delete this boss?")) return;
-  state[kind].splice(idx, 1);
-  saveState();
-  renderAll();
-}
-
 /* ---------------------------
    Manual logic
 ----------------------------*/
@@ -610,6 +572,7 @@ function renderAll(){
   renderManual();
   renderScheduled();
 }
+
 function renderManual(){
   manualGrid.innerHTML = "";
 
@@ -621,10 +584,6 @@ function renderManual(){
     card.className = "card manual";
 
     card.innerHTML = `
-      <button class="dangerSmall" title="Delete" aria-label="Delete">
-        ✕ <span style="font-size:11px; font-weight:900">DEL</span>
-      </button>
-
       <div class="topRow">
         <div class="bossName">${escapeHtml(b.name)}</div>
         <div class="pill">${b.hours}h</div>
@@ -660,8 +619,6 @@ function renderManual(){
         <div class="muted">${b.lastKill ? "Kill set" : "No kill yet"}</div>
       </div>
     `;
-
-    card.querySelector(".dangerSmall").addEventListener("click", () => removeBoss("manual", idx));
 
     card.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action]");
@@ -699,16 +656,12 @@ function renderScheduled(){
     const card = document.createElement("div");
     card.className = "card scheduled";
     card.innerHTML = `
-      <button class="dangerSmall" title="Delete" aria-label="Delete">
-        ✕ <span style="font-size:11px; font-weight:900">DEL</span>
-      </button>
-
       <div class="topRow">
         <div class="bossName">${escapeHtml(b.name)}</div>
         <div class="pill">Scheduled</div>
       </div>
 
-      <div class="timer white" data-sched-timer="${idx}">00:00:00</div>
+      <div class="timer red" data-sched-timer="${idx}">00:00:00</div>
       <div class="nextLine">NEXT: <span data-sched-next="${idx}">${nextTxt}</span></div>
 
       <div class="controls">
@@ -725,8 +678,6 @@ function renderScheduled(){
         <div class="muted">Local time</div>
       </div>
     `;
-
-    card.querySelector(".dangerSmall").addEventListener("click", () => removeBoss("scheduled", idx));
 
     card.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action]");
@@ -760,11 +711,18 @@ function renderScheduled(){
 }
 
 /* ---------------------------
-   Live ticking
+   Live ticking (GREEN running, RED out of time)
 ----------------------------*/
+function setTimerColor(el, diffMs){
+  el.classList.remove("green","red");
+  if(diffMs > 0) el.classList.add("green");
+  else el.classList.add("red");
+}
+
 function tick(){
   const now = new Date();
 
+  // manual timers
   document.querySelectorAll("[data-manual-timer]").forEach(el => {
     const idx = Number(el.getAttribute("data-manual-timer"));
     const b = state.manual[idx];
@@ -772,10 +730,14 @@ function tick(){
 
     if(!next){
       el.textContent = "00:00:00";
+      el.classList.remove("green","red");
+      el.classList.add("red");
       return;
     }
+
     const diff = next - now;
     el.textContent = msToClock(diff);
+    setTimerColor(el, diff);
   });
 
   document.querySelectorAll("[data-manual-next]").forEach(el => {
@@ -784,6 +746,7 @@ function tick(){
     el.textContent = next ? formatClock(next) : "--:-- --";
   });
 
+  // scheduled timers
   document.querySelectorAll("[data-sched-timer]").forEach(el => {
     const idx = Number(el.getAttribute("data-sched-timer"));
     const b = state.scheduled[idx];
@@ -791,9 +754,14 @@ function tick(){
 
     if(!next){
       el.textContent = "00:00:00";
+      el.classList.remove("green","red");
+      el.classList.add("red");
       return;
     }
-    el.textContent = msToClock(next - now);
+
+    const diff = next - now;
+    el.textContent = msToClock(diff);
+    setTimerColor(el, diff);
   });
 
   document.querySelectorAll("[data-sched-next]").forEach(el => {
