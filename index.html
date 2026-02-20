@@ -57,6 +57,7 @@
       margin-bottom: 14px;
     }
 
+    /* Inputs/Buttons */
     .input, .btn{
       height: 34px;
       border-radius: 8px;
@@ -65,6 +66,9 @@
       color: var(--text);
       padding: 0 10px;
       outline:none;
+
+      width: 100%;
+      max-width: 100%;
     }
     .input{
       min-width: 150px;
@@ -86,6 +90,7 @@
       border-color: rgba(120,170,255,.35);
     }
 
+    /* Grid */
     .grid{
       display:grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -93,30 +98,44 @@
       align-items: stretch;
     }
 
+    /* ===== CARD FIXES (fits content inside borders) ===== */
     .card{
       position: relative;
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
       padding: 12px;
-      overflow:hidden;
+      overflow: hidden;  /* stops all bleeding */
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
     }
 
-    /* Red outer + gold inner like your screenshot */
+    /* Red outer + gold inner */
     .card.manual{
       border: 2px solid rgba(255,59,59,.75);
     }
     .card.scheduled{
       border: 2px solid rgba(202,162,74,.60);
     }
+
+    /* Inner border */
     .card::before{
       content:"";
       position:absolute;
-      inset: 10px;
-      border-radius: calc(var(--radius) - 8px);
-      border: 1px solid rgba(242,211,138,.25);
+      inset: 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(242,211,138,.22);
       pointer-events:none;
-      opacity:.8;
+      opacity:.9;
+    }
+
+    /* Keep all content above inner border */
+    .card > *{
+      position: relative;
+      z-index: 1;
     }
 
     .topRow{
@@ -124,7 +143,8 @@
       justify-content: space-between;
       align-items:flex-start;
       gap: 10px;
-      margin-bottom: 6px;
+      padding-right: 64px; /* space for DEL */
+      margin-bottom: 2px;
     }
 
     .bossName{
@@ -133,7 +153,10 @@
       letter-spacing: .7px;
       text-transform: uppercase;
       line-height: 1.1;
-      max-width: 75%;
+      max-width: 100%;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .pill{
@@ -152,7 +175,7 @@
       font-weight: 900;
       font-size: 20px;
       letter-spacing: .4px;
-      margin: 2px 0 6px 0;
+      margin: 0;
     }
     .timer.red{ color: var(--accentRed); }
     .timer.white{ color: #ffffff; }
@@ -160,7 +183,7 @@
     .nextLine{
       font-size: 11px;
       color: rgba(255,255,255,.8);
-      margin-bottom: 10px;
+      margin: 0 0 6px 0;
       letter-spacing: .2px;
     }
     .nextLine span{
@@ -168,49 +191,60 @@
       font-weight: 700;
     }
 
+    /* Controls rows fit inside card */
     .controls{
       display:grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr 44px; /* fixed icon button width */
       gap: 8px;
       align-items:center;
-      margin-bottom: 10px;
+      margin: 0;
+      min-width: 0;
     }
+
     .dateRow{
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+      min-width: 0;
+    }
+    .dateRow .input{
+      min-width: 0; /* key: allow shrinking */
     }
 
     .miniBtn{
-      height: 30px;
-      border-radius: 9px;
+      width: 44px;
+      height: 34px;
+      border-radius: 10px;
       border: 1px solid rgba(202,162,74,.55);
       background: rgba(202,162,74,.10);
       color: rgba(255,255,255,.92);
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: .2px;
       cursor:pointer;
     }
     .miniBtn:hover{
       background: rgba(202,162,74,.14);
-      border-color: rgba(202,162,74,.75);
+      border-color: rgba(202,162,74,.80);
     }
 
     .btnStack{
       display:grid;
       grid-template-columns: 1fr;
-      gap: 6px;
+      gap: 8px;
+      margin-top: 2px;
     }
 
     .stackBtn{
-      height: 30px;
-      border-radius: 10px;
+      height: 34px;
+      border-radius: 12px;
       border: 1px solid rgba(242,211,138,.35);
       background: rgba(255,255,255,.04);
       color: rgba(255,255,255,.92);
-      font-weight: 750;
+      font-weight: 800;
       cursor:pointer;
       text-transform: none;
+      width: 100%;
+      max-width: 100%;
     }
     .stackBtn:hover{
       background: rgba(255,255,255,.06);
@@ -225,27 +259,30 @@
       gap: 10px;
       flex-wrap:wrap;
       padding-top: 4px;
+      margin-top: 2px;
     }
 
     .dangerSmall{
       position:absolute;
       top: 10px;
       right: 10px;
-      border: 1px solid rgba(255,59,59,.35);
-      background: rgba(255,59,59,.08);
+      z-index: 2;
+
+      border: 1px solid rgba(255,59,59,.45);
+      background: rgba(255,59,59,.10);
       border-radius: 999px;
-      height: 26px;
-      padding: 0 9px;
-      color: rgba(255,255,255,.9);
-      font-weight: 800;
+      height: 24px;
+      padding: 0 10px;
+      color: rgba(255,255,255,.92);
+      font-weight: 900;
       cursor:pointer;
       display:flex;
       align-items:center;
       gap: 6px;
     }
     .dangerSmall:hover{
-      background: rgba(255,59,59,.12);
-      border-color: rgba(255,59,59,.55);
+      background: rgba(255,59,59,.14);
+      border-color: rgba(255,59,59,.65);
     }
 
     .muted{ color: var(--muted); }
@@ -267,6 +304,13 @@
     .sectionTitle h2{
       font-size: 18px;
       font-weight: 900;
+    }
+
+    /* Mobile safety */
+    @media (max-width: 420px){
+      .controls{ grid-template-columns: 1fr 40px; }
+      .miniBtn{ width: 40px; }
+      .topRow{ padding-right: 58px; }
     }
   </style>
 </head>
@@ -381,7 +425,6 @@ const DOW = { sun:0, mon:1, tue:2, wed:3, thu:4, fri:5, sat:6 };
 
 function pad(n){ return String(n).padStart(2,"0"); }
 function formatClock(dt){
-  // Local time display, like "05:24 AM"
   const h = dt.getHours();
   const m = dt.getMinutes();
   const ampm = h >= 12 ? "PM" : "AM";
@@ -389,7 +432,6 @@ function formatClock(dt){
   return `${pad(hh)}:${pad(m)} ${ampm}`;
 }
 function formatShort(dt){
-  // e.g. 1/13/2026, 5:45:01 PM
   const mo = dt.getMonth()+1;
   const da = dt.getDate();
   const yr = dt.getFullYear();
@@ -402,7 +444,6 @@ function formatShort(dt){
 }
 
 function msToClock(ms){
-  const neg = ms < 0;
   ms = Math.abs(ms);
 
   const sec = Math.floor(ms / 1000);
@@ -418,8 +459,6 @@ function msToClock(ms){
 }
 
 function parseScheduleRule(ruleStr){
-  // "mon 12:30, tue 19:00"
-  // returns [{dow:1, hour:12, min:30}, ...]
   const parts = ruleStr.split(",").map(s => s.trim()).filter(Boolean);
   const out = [];
   for(const p of parts){
@@ -442,7 +481,6 @@ function nextOccurrenceFromRule(ruleStr, fromDate = new Date()){
   let best = null;
 
   for(const r of rules){
-    // find next date matching r.dow at r.hour:r.min
     const candidate = new Date(now);
     candidate.setSeconds(0,0);
     candidate.setHours(r.hour, r.min, 0, 0);
@@ -450,7 +488,6 @@ function nextOccurrenceFromRule(ruleStr, fromDate = new Date()){
     const curDow = now.getDay();
     let addDays = (r.dow - curDow + 7) % 7;
 
-    // if same day but time passed, push 7 days
     if(addDays === 0 && candidate <= now) addDays = 7;
 
     candidate.setDate(candidate.getDate() + addDays);
@@ -539,7 +576,6 @@ function manualSetKill(idx){
 
   if(!dateVal || !timeVal) return;
 
-  // local datetime
   const dt = new Date(`${dateVal}T${timeVal}:00`);
   if(Number.isNaN(dt.getTime())) return;
 
@@ -560,7 +596,6 @@ function manualSetNext(idx){
   const next = new Date(`${dateVal}T${timeVal}:00`);
   if(Number.isNaN(next.getTime())) return;
 
-  // derive lastKill from next - hours
   const kill = new Date(next.getTime() - (state.manual[idx].hours * 3600 * 1000));
   state.manual[idx].lastKill = kill.toISOString();
   state.manual[idx].lastRestart = new Date().toISOString();
@@ -626,10 +661,8 @@ function renderManual(){
       </div>
     `;
 
-    // delete button
     card.querySelector(".dangerSmall").addEventListener("click", () => removeBoss("manual", idx));
 
-    // actions
     card.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action]");
       if(!btn) return;
@@ -710,7 +743,6 @@ function renderScheduled(){
       }
 
       if(action === "setNextNow"){
-        // quick helper: sets the schedule to a single entry at next top-of-hour + 5 min on current day
         const now = new Date();
         now.setSeconds(0,0);
         now.setMinutes(now.getMinutes() + 5);
@@ -733,7 +765,6 @@ function renderScheduled(){
 function tick(){
   const now = new Date();
 
-  // manual timers
   document.querySelectorAll("[data-manual-timer]").forEach(el => {
     const idx = Number(el.getAttribute("data-manual-timer"));
     const b = state.manual[idx];
@@ -753,7 +784,6 @@ function tick(){
     el.textContent = next ? formatClock(next) : "--:-- --";
   });
 
-  // scheduled timers
   document.querySelectorAll("[data-sched-timer]").forEach(el => {
     const idx = Number(el.getAttribute("data-sched-timer"));
     const b = state.scheduled[idx];
@@ -782,7 +812,6 @@ function escapeHtml(str){
     .replaceAll("'","&#039;");
 }
 function escapeAttr(str){
-  // safe for value=""
   return escapeHtml(str).replaceAll("\n"," ");
 }
 
